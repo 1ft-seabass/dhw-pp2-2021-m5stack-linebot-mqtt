@@ -5,7 +5,8 @@
   "main": "app.js",
   "dependencies": {
     "@line/bot-sdk": "^7.4.0",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "mqtt": "^4.2.8"
   },
   "devDependencies": {},
   "scripts": {
