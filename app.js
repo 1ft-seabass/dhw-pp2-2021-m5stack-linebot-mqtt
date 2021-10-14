@@ -32,8 +32,18 @@ let clientMQTT  = mqtt.connect(clientMQTTAddress,
 clientMQTT.on('connect', function () {
   // 接続時にログ
   console.log('MQTT Connected!');
+  // M5Stack からのデータ受信を待ちます
+  // M5Stack の A B C ボタンを押したときに送られてきます
+  clientMQTT.subscribe('/dhw/pp2/mqtt/YOURNAME/publish');
   // 起動時に MQTT メッセージを送ります
-  clientMQTT.publish('/dhw/pp2/mqtt/student/allMessage', 'Hello MQTT LINE BOT!');
+  // JSON を作る
+  const jsonData = {
+    message:"Hello MQTT LINE BOT!"
+  };
+  // JSON を文字列にする
+  const jsonString = JSON.stringify(jsonData);
+  // M5Stack が待っているトピックにデータを送る
+  clientMQTT.publish('/dhw/pp2/mqtt/student/allMessage', jsonString);
 })
 
 /// LINE BOT の処理 //////////////////////////////////////
@@ -48,10 +58,6 @@ const config = {
 const userId = '作成したBOTのユーザーID';
 
 const app = express();
-
-// M5Stack からJSON データを受け取ったときに扱えるようにする設定
-// https://qiita.com/kmats/items/2c2502cfa3a633e7e049
-app.use('/from/m5stack', express.json()); 
 
 app.get('/', (req, res) => res.send('Hello LINE BOT!(GET)')); //ブラウザ確認用(無くても問題ない)
 app.post('/webhook', line.middleware(config), (req, res) => {
@@ -77,11 +83,20 @@ async function handleEvent(event) {
   }
 
   // M5Stack にも MQTT メッセージを送ります
-  clientMQTT.publish('/dhw/pp2/mqtt/YOURNAME/subscribe', 'Hello MQTT LINE BOT!');
-
+  console.log(event.message.text);
+  // JSON を作る
+  const jsonData = {
+    message:event.message.text
+  };
+  // JSON を文字列にする
+  const jsonString = JSON.stringify(jsonData);
+  // M5Stack が待っているトピックにデータを送る
+  clientMQTT.publish('/dhw/pp2/mqtt/YOURNAME/subscribe', jsonString);
+  // LINE にメッセージ
+  const messageLINE = event.message.text + 'のメッセージが M5Stack に送信されました';
   return client.replyMessage(event.replyToken, {
     type: 'text',
-    text: event.message.text //実際に返信の言葉を入れる箇所
+    text: messageLINE
   });
 }
 
