@@ -93,7 +93,7 @@ async function handleEvent(event) {
   // M5Stack が待っているトピックにデータを送る
   clientMQTT.publish('/dhw/pp2/mqtt/YOURNAME/subscribe', jsonString);
   // LINE にメッセージ
-  const messageLINE = event.message.text + 'のメッセージが M5Stack に送信されました';
+  const messageLINE = event.message.text + 'のメッセージが MQTT に送信されました';
   return client.replyMessage(event.replyToken, {
     type: 'text',
     text: messageLINE
